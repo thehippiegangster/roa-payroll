@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ROA Payroll: Search</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <!--<script>
+  $(function() {
+    $( "#datepicker" ).datepicker.formatDate("yyyy-mm-dd");
+  });
+  $(function() {
+    $( "#datepicker1" ).datepicker.formatDate("yyyy-mm-dd");
+  });
+  </script>-->
+  <script type="text/javascript">
+  // Material Select
+$('.mdb-select').materialSelect({
+});
+//datepicker
+$( document ).ready(function() {
+    $("#datepicker").datepicker({ 
+        format: 'yyyy-mm-dd'
+    });
+    $("#datepicker").on("change", function () {
+        var startdate = $(this).val();
+        alert(startdate);
+    });
+}); 
+$( document ).ready(function() {
+    $("#datepicker1").datepicker({ 
+        format: 'yyyy-mm-dd'
+    });
+    $("#datepicker1").on("change", function () {
+        var enddate = $(this).val();
+        alert(enddate);
+    });
+}); 
+</script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</head>
+<body>
+ <h2>Please select two Sundays for Start Date and End Date:</h2>
+<!--<form action="{% url 'results' %}" method="get" id=searchForm>-->
+<!--<form action="http://10.0.0.153:8000/results/?start=2020-03-01&end=2020-03-08&employee=1" method="post">-->
+  <form method="get" id="searchForm" data-emp-url="{% url 'load_employees' %}" novalidate>
+  <input type="hidden" id="csrf_token" value='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
+  <p>Date Start: <input type="date" id="datepicker" name="start" placeholder="Start Date"></p>
+  <p>Date End: <input type="date" id="datepicker1" name="end" placeholder="End Date"></p>
+  <label class="mdb-main-label">Employee</label>
+ {% include "emp_dropdown_list_options.html" %}
+  <!--<select class="mdb-select" searchable="Search Employee" name="employee" id="employees">
+    <option value="1" disabled selected>Choose Employee</option>
+    {% for emp in employees %}
+      <option value="{{emp.employee_id}}"
+        {% if emp == current_emp %}selected="selected"{% endif %}>
+        {{emp.technician|capfirst}}
+      </option>
+    {% endfor %}
+  </select>-->  
+  <p></p>
+  <input type="submit" value="Submit" formaction="{% url 'results' %}"></input>
+ </form>
+<script>
+    $("#datepicker1").change(function () {
+      var url = $("#searchForm").attr("data-emp-url");  // get the url of the `load_employees` view
+      var startdate = $('#datepicker').val();  // get the selected dates from the HTML input
+      var enddate = $('#datepicker1').val();
+
+      $.ajax({                       // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'startDate': startdate,
+          'endDate': enddate,      // add the start and end date to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_cities` view function
+          $("#employees").html(data);  // replace the contents of the employee input with the data that came from the server
+        }
+      });
+
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<head>
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</head>
+<body>
+  <script type="text/javascript">
+    /*******************
+TO DO TO COMPLETE:
+-Homepage
+  -adjust link logic
+  -add bootstrap template
+-CSS
+  -search
+  -results
+  -homepage
+-create production server, instead of development server
+
+*******************/
+    alert('almost done! keep it up!')
+    var object_list = ["{{object_list}}"];
+    var payments = ["{{payments}}"];
+    var technicians = ["{{technicians}}"];
+    var helpers = ["{{helpers}}"];
+    var pending = ["{{pending}}"];
+    var rateList = ["{{rate}}"];
+    var splits = ["{{splits}}"];
+    var pmas = ["{{pmas}}"];
+    var dataSet =[];
+    var splitSet = [];
+    var pendSet = [];
+    var notes = [];
+
+    var pendingStatus = null;
+    var percFee = 0.0;
+    var decFee = 0.0;
+    var financefee = null;
+    var isSplit = false;
+    var pmaBonus = 0;
+    var matcost;
+    var parts;
+    var invAmt;
+    var profit;
+    var earnings;
+    var weeklyRate;
+    var position;
+    var invoice;
+    var i = 0;
+    var j = 0;
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const employee = urlParams.get('employee');
+
+    position = getPosition(employee);
+    weeklyRate = getWeeklyRate();
+  
+
+//loop through employee invoices and get values 
+    {% for inv in object_list %}
+      //get invoice variables from main queryset
+      object_list[i] = {};
+      object_list[i]['invoice'] = "{{inv}}";
+      object_list[i]['matcost'] = parseFloat("{{inv.matcost}}");
+      object_list[i]['invamount'] = parseFloat("{{inv.invamount}}");
+      object_list[i]['customer'] = "{{inv.customer}}";
+      object_list[i]['collected'] = "{{inv.collected}}";
+
+      //set invoice variables
+      invoice = object_list[i].invoice;
+      invAmt = object_list[i].invamount;
+      matcost = object_list[i].matcost;
+      customer = object_list[i].customer;
+      collected = object_list[i].collected;
+
+      //get calculated variables
+      pendingStatus = getPending(invoice);
+      getfee = getFinanceFee(invoice);
+      
+      if(isNaN(getfee)===true){
+        financefee = null;
+      } else {
+        financefee = getfee;
+      }
+
+      parts = getParts(financefee, matcost);
+      profit = getProfit(invAmt, parts);
+      pma = getPMABonus(invoice);
+      isSplit = checkSplits(invoice);
+
+      //calculate earnings
+      if(isSplit == true){
+        earnings = getSplitEarnings(invoice, employee);
+      } else {
+        checkEarnings = getEarnings(weeklyRate, profit);
+        if(isNaN(checkEarnings)==true){
+          earnings = 0;
+        } else {
+          earnings = checkEarnings;
+        }
+      }
+
+      if(profit <= 0){
+        profit = 0;
+        earnings = 0;
+      }
+      //send data to table row
+      if(isSplit === true) {
+        splitSet.push([invoice, customer, pendingStatus, invAmt, collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+      }
+      if(pendingStatus != null) {
+        pendSet.push([invoice, customer, pendingStatus, invAmt, collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+      } else if(isSplit != true) {
+        dataSet.push([invoice, customer, pendingStatus, invAmt, collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+      }
+      i++;
+    {% endfor %}
+     
+      //SEND DATA TO TABLE ROW
+      
+      /*(if(isSplit == true){
+        console.log("split table logic works");
+        splitSet.push(["{{inv.invoice}}", "{{inv.customer}}", pendingStatus, "{{inv.invamount}}", "{{inv.collected}}", parts, profit.toFixed(2), earnings.toFixed(2), "IN PROGRESS", "notes needed?"]);
+      } else if(pendingStatus != null){
+        console.log("pend table logic works");
+        pendSet.push(["{{inv.invoice}}", "{{inv.customer}}", pendingStatus, "{{inv.invamount}}", "{{inv.collected}}", parts, profit.toFixed(2), earnings.toFixed(2), "need to do PMA if logic in view", "notes needed?"]);
+      } else { 
+        console.log("else data works");
+        dataSet.push(["{{inv.invoice}}", "{{inv.customer}}", pendingStatus, "{{inv.invamount}}", "{{inv.collected}}", parts, profit.toFixed(2), earnings.toFixed(2), "IN PR
+    */
+
+function checkSplits(invoice){
+  var nosplit = false;
+  {% for s in splits %}
+    splits[i] = {};
+    splits[i]['invoice'] = "{{s.invoice}}";
+    splits[i]['desc'] = "{{s.desc}}";
+    
+    var desc = splits[i].desc;
+    var sinvoice = splits[i].invoice;
+    var split = false;
+    
+    if(sinvoice == invoice) {
+      split = true;
+      notes.push(desc);
+      //console.log(notes);
+      return split;
+    }
+    i++;
+  {% endfor %} 
+
+  return nosplit;
+}
+  
+function getFinanceFee(invoice){
+  var finfee = null;
+  {% for pt in payments %}
+    payments[i] = {};
+    payments[i]['paymtInvoice'] = "{{pt.invoice}}";
+    payments[i]['financeFee'] = "{{pt.paymethod.cost}}";
+
+    var paymtInvoice = payments[i].paymtInvoice;
+    var fee = parseFloat(payments[i].financeFee);
+    if(paymtInvoice == invoice){
+        finfee = fee;
+    }
+    i++;
+  {% endfor %}
+  return finfee;
+}
+
+function getPending(invoice){
+  var status = null;
+  {% for pn in pending %}
+    pending[i] = {};
+    pending[i]['pendInvoice'] = "{{pn.invoice}}";
+    pending[i]['pendStatus'] = "{{pn.desc}}";
+
+    var pendInvoice = pending[i].pendInvoice;
+    
+    if(pendInvoice == invoice){
+      status = pending[i].pendStatus;
+    }
+    i++;
+  {% endfor %}
+  return status;
+}
+
+function getPMABonus(invoice){
+  var pmbonus = 0;
+  {% for pm in pmas %}
+    pmas[i] = {};
+    pmas[i]['invoice'] = "{{pm.invoice}}";
+    pmas[i]['desc'] = "{{pm.desc}}";
+    var pminv = pmas[i].invoice;
+    var pmdesc = pmas[i].desc;
+    var bonus = 0;
+
+    if(pminv == invoice){
+      if(j==0){
+        bonus = 10;
+      } else if(j > 0) {
+        bonus = 5;
+      }
+      j = ++j;
+      pmbonus = bonus;
+      notes.push(pmdesc);
+      //console.log(notes);
+    } 
+    i++;
+  {% endfor %}
+  return pmbonus;
+}
+
+
+function getPosition(employee) {
+  var employees = ["{{employees}}"];
+  var intEmp = parseFloat(employee);
+  var position = "unknown employee";
+
+  {% for emp in employees %}
+    var empId = parseFloat("{{emp.employee_id}}");
+    if("{{emp.employee_id}}" == employee){
+      position = "{{emp.position}}";
+    } 
+  {% endfor %}
+  
+  return position;
+}
+
+function getSplitEarnings(invoice, employee){
+  var sinv = "";
+  var desc = "";
+  var splitSystem = null;
+  var packageUnit = null;
+  var rate = null;
+  var splitEarnings = null;
+
+  
+    splitSystem = "{{rate.split_system}}";
+    packageUnit = "{{rate.package_unit}}";
+    rate = "{{rate.rate_percent}}";
+
+    {% for s in splits %}
+      desc = "{{s.desc}}";
+      if("{{s.invoice}}" == invoice && desc.includes("SPLIT SYSTEM")){
+        splitEarnings = rate * splitSystem;
+        notes.push(desc);
+        //console.log(notes);
+      } else if ("{{s.invoice}}" == invoice && desc.includes("PACKAGE UNIT")){
+        splitEarnings = rate * packageUnit;
+        notes.push(desc);
+        //console.log(notes);
+      }
+    {% endfor %}
+  
+  return splitEarnings;
+}
+
+function getEarnings(weeklyRate, profit){
+  var empEarnings = weeklyRate * profit;
+  return empEarnings;
+}
+
+function getWeeklyRate(){
+  var sumInvoices = [];
+  var totalAmount;
+  var high55;
+  var high75;
+  var low100;
+  var high100;
+
+  {% for inv in object_list %}
+    invAmt = parseFloat("{{inv.invamount}}");
+    sumInvoices.push(invAmt);
+  {% endfor %}
+
+  totalAmount = sumInvoices.reduce((a,b) => a + b, 0);
+
+  {% for tech in technicians %}
+    if("{{tech.employee_id}}" == employee){
+      high55 = parseFloat("{{tech.high_55}}");
+      high75 = parseFloat("{{tech.high_75}}");
+      low100 = parseFloat("{{tech.low_100}}");
+      high100 = parseFloat("{{tech.high_100}}");
+    }
+  {% endfor %}
+
+  weeklyRate = high55/100;
+
+  if ((totalAmount > 5500) && (totalAmount < 7500)) {
+    weeklyRate = high75/100;
+  } else if ((totalAmount > 7500) && (totalAmount < 10000)) {
+    weeklyRate = low100/100;
+  } else if (totalAmount > 10000) {
+    weeklyRate = high100/100;
+  } 
+  return weeklyRate;
+}
+
+function getProfit(invAmount, parts){
+  if(invAmount != 0.0){ 
+    profit = invAmount - parts;
+  } else {
+    profit = invAmount;
+  }
+  return profit;
+}
+
+function getParts(financeFee, matcost){
+  parts = matcost;
+  if(financefee != 0.0 && matcost != 0.0){
+    parts = financefee * matcost;
+  } 
+  return parts;
+}
+
+// DISPLAY TABLE AND RESULTS
+$(document).ready(function() {   
+  $('#invoices').DataTable( {
+      retrieve: true, 
+      paging: false, 
+      data: dataSet,
+      columns: [
+          { title: "Invoice" },
+          { title: "Customer" },
+          { title: "Status" },
+          { title: "Sales" },
+          { title: "Collected" },
+          { title: "Parts" },
+          { title: "Profit" },
+          { title: "Earnings" },
+          { title: "PMA/Svc" },
+          { title: "Notes" },
+          {
+            "defaultContent": ""
+          }
+      ]
+  } );
+} );
+
+$(document).ready(function() {   
+  $('#pendInvoices').DataTable( {
+      retrieve: true, 
+      paging: false, 
+      data: pendSet,
+      columns: [
+          { title: "Invoice" },
+          { title: "Customer" },
+          { title: "Status" },
+          { title: "Sales" },
+          { title: "Collected" },
+          { title: "Parts" },
+          { title: "Profit" },
+          { title: "Earnings" },
+          { title: "PMA/Svc" },
+          { title: "Notes" },
+          {
+            "defaultContent": ""
+          }
+      ]
+  } );
+} );
+
+$(document).ready(function() {   
+  $('#splitInvoices').DataTable( {
+      retrieve: true, 
+      paging: false, 
+      data: splitSet,
+      columns: [
+          { title: "Invoice" },
+          { title: "Customer" },
+          { title: "Status" },
+          { title: "Sales" },
+          { title: "Collected" },
+          { title: "Parts" },
+          { title: "Profit" },
+          { title: "Earnings" },
+          { title: "PMA/Svc" },
+          { title: "Notes" },
+          {
+            "defaultContent": ""
+          }
+      ]
+  } );
+} );
+
+  </script>
+  <table id="invoices" class="display" width="100%"></table>
+  <table id="pendInvoices" class="display" width="100%"></table>
+  <table id="splitInvoices" class="display" width="100%"></table>
+</body>
+
+

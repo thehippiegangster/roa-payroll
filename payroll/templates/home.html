@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>ROA Accounting Home</title>
+	<h1>ROA Accounting Home</h1>
+</head>
+<body><h1>Home Page</h1>
+<br>
+<br>
+<p>Need to update the links by using django template system</p>
+<a href="https://10.0.0.153/getInvoices.html">Generate Commissions Report</a><br>
+<a href="https://10.0.0.13/Pending.php">Pending</a><br>
+<a href="https://10.0.0.13:12322">Database</a><br>
+<a href="https://10.0.0.13/Users.php">Sales Sort Code</a><br>
+<a href="https://10.0.0.13/PHPExcel-1.8/GetAgreements.php">PMA Amortization</a><br>
+<b>Click on the 'reporting' database on the left panel.</b>
+
+<br><br><br>
+<b>Installer/Helper will not have parts cost added to Parts, only Finance Fee!</b><br>
+1 year PMA & Collected < $75: $5 BONUS<br>
+PMA Check & Collected >$0: $0 BONUS<br>
+
+<b>Installer/Helper will only be paid if one of these line items is present:</b><br><br>
+
+<br>Package Unit
+<br>Split System
+<br>New Lineset
+<br>New Duct Run
+<br>Existing Duct Run Replaced
+<br>New T-stat wire
+<br>Hourly Std Rate
+<br>Hourly O/T Rate
+
+<br>
+<br>
+<br>
+<b>These tables in the database need to be maintained and updated:</b><br>
+<br>Extras
+<br>Financing
+<br>Helper
+<br>InstallationRates
+<br>PMABonus
+<br>SelfGeneratedInvoice
+<br>Technician
+<br>
+<br>
+<br>
+<b>Reserved words in line items (may be upper or lowercase):</b>
+<br>
+<br>SPLIT W
+<br>SPLIT FROM
+<br>warranty hours
+<br>PENDING
+<br>PMA CHECK UP
+<br>EST
+
+<br>
+<br>
+<br>
+
+--MASS UPDATE OF A TABLE: BROWSE THE TABLE AND THEN CLICK THE 'SQL' TAB, PASTE THE QUERY AND SUBMIT IT; <br>
+--THIS EXAMPLE WILL UPDATE THE PER UNIT RATE FOR ALL EMPLOYEES; more MySQL examples are found online:<br><br>
+
+update reporting.Technician SET PER_UNIT='10'
+</body>
+
