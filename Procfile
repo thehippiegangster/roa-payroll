@@ -1,1 +1,1 @@
-web: uvicorn payroll.asgi:application --reload --port 5000
+web: gunicorn payroll.wsgi
