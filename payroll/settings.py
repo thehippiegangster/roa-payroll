@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'payrollsite',
     'import_export',
     'liststyle',
-    'bootstrap_themes',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
