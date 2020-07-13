@@ -1,1 +1,1 @@
-web: uvicorn payroll.asgi:application
+web: uvicorn payroll.asgi:application --reload --port 8000
