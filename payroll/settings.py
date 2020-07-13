@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import mimetypes
-
+import django_heroku
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
@@ -89,9 +89,9 @@ DATABASES = {
 	'PASSWORD': 'a1garage',
 	'HOST': '10.0.0.152',
 	'PORT': '3306',
+    'CONN_MAX_AGE': '3600',
 	'OPTIONS': {
 	    'init_command': 'SET foreign_key_checks = 0;',
-
 	    },
 	}
 }
@@ -138,5 +138,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 mimetypes.add_type("text/css", ".css", True)
 
 # Configure Django App for Heroku.
-import django_heroku
 django_heroku.settings(locals())
