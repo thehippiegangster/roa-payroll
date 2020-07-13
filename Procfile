@@ -1,1 +1,1 @@
-web: gunicorn payroll.asgi
+web: Uvicorn payroll.asgi:application
