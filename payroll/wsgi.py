@@ -15,5 +15,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'payroll.settings')
 
 application = get_wsgi_application()
 
-from payroll.wsgi import payroll
-application = payroll(application)
+from payroll.wsgi import payrollsite
+application = payrollsite(application)
