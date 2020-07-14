@@ -1,1 +1,1 @@
-web: gunicorn payroll.wsgi
+web: gunicorn payroll.wsgi --preload --workers 1
