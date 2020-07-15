@@ -16,6 +16,7 @@ import mimetypes
 import django_heroku
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
 
@@ -26,7 +27,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 SECRET_KEY = '#gxf6^78u7odf0qx@=wzrp^+9ovus-d&eziq06ativ4i45keb9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['10.0.0.153', '127.0.0.1']
 
@@ -34,9 +35,6 @@ ALLOWED_HOSTS = ['10.0.0.153', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'payrollsite',
-    'import_export',
-    'liststyle',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,6 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'debug_toolbar',
     'mathfilters',
+    'payrollsite',
+    'import_export',
+    'liststyle',
+    'bootstrap_themes',
 ]
 
 MIDDLEWARE = [
@@ -133,6 +135,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static")
+]
 
 #CSS
 mimetypes.add_type("text/css", ".css", True)

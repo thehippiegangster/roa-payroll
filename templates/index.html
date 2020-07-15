@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 {% load static %}
-
+{% load bootstrap_themes %}
+{% bootstrap_script use_min=True %}
 <head>
 
   <meta charset="utf-8">
@@ -10,7 +11,7 @@
   <meta name="author" content="">
 
   <title>ROA Payroll</title>
-
+  {% bootstrap_styles theme='cosmo' type='css' %}
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" type="text/css" href="{% static 'payroll/vendor/bootstrap/css/bootstrap.css' %}">
 
