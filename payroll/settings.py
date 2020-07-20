@@ -89,7 +89,7 @@ DATABASES = {
 	'PASSWORD': 'a1garage',
 	'HOST': '10.0.0.152',
 	'PORT': '3306',
-    'CONN_MAX_AGE': '3600',
+    'CONN_MAX_AGE': 3600,
 	'OPTIONS': {
 	    'init_command': 'SET foreign_key_checks = 0;',
 	    },
