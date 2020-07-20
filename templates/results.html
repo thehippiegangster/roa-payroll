@@ -1,25 +1,18 @@
 <head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+  <link rel="https://cdn.datatables.net/responsive/2.2.5/css/responsive.bootstrap4.min.css">
   <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
   <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <style>
+    .container {
+      margin: 5px;
+    }
+  </style>
 </head>
 <body>
   <script type="text/javascript">
-    /*******************
-TO DO TO COMPLETE:
--Homepage
-  -adjust link logic
-  -add bootstrap template
--CSS
-  -search
-  -results
-  -homepage
--create production server, instead of development server
-
-*******************/
-    alert('almost done! keep it up!')
     var object_list = ["{{object_list}}"];
     var payments = ["{{payments}}"];
     var technicians = ["{{technicians}}"];
@@ -105,30 +98,22 @@ TO DO TO COMPLETE:
         profit = 0;
         earnings = 0;
       }
+      var isValid = isValidData(invAmt, earnings, pma);
+      
       //send data to table row
-      if(isSplit === true) {
-        splitSet.push([invoice, customer, pendingStatus, invAmt, collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+      if(isValid == true){
+        if(isSplit === true) {
+          splitSet.push([invoice, customer, pendingStatus, invAmt.toFixed(2), collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+        } else if(pendingStatus != null) {
+          pendSet.push([invoice, customer, pendingStatus, invAmt.toFixed(2), collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+        } else if(isSplit != true) {
+          dataSet.push([invoice, customer, pendingStatus, invAmt.toFixed(2), collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+        }
       }
-      if(pendingStatus != null) {
-        pendSet.push([invoice, customer, pendingStatus, invAmt, collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
-      } else if(isSplit != true) {
-        dataSet.push([invoice, customer, pendingStatus, invAmt, collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
-      }
+      
       i++;
     {% endfor %}
      
-      //SEND DATA TO TABLE ROW
-      
-      /*(if(isSplit == true){
-        console.log("split table logic works");
-        splitSet.push(["{{inv.invoice}}", "{{inv.customer}}", pendingStatus, "{{inv.invamount}}", "{{inv.collected}}", parts, profit.toFixed(2), earnings.toFixed(2), "IN PROGRESS", "notes needed?"]);
-      } else if(pendingStatus != null){
-        console.log("pend table logic works");
-        pendSet.push(["{{inv.invoice}}", "{{inv.customer}}", pendingStatus, "{{inv.invamount}}", "{{inv.collected}}", parts, profit.toFixed(2), earnings.toFixed(2), "need to do PMA if logic in view", "notes needed?"]);
-      } else { 
-        console.log("else data works");
-        dataSet.push(["{{inv.invoice}}", "{{inv.customer}}", pendingStatus, "{{inv.invamount}}", "{{inv.collected}}", parts, profit.toFixed(2), earnings.toFixed(2), "IN PR
-    */
 
 function checkSplits(invoice){
   var nosplit = false;
@@ -316,6 +301,14 @@ function getParts(financeFee, matcost){
   return parts;
 }
 
+function isValidData(Sales, empEarns, empPma){
+  valid = true;
+  if(Sales==0 && empEarns==0 && empPma==0) {
+    valid = false;
+  } 
+  return valid;
+}
+
 // DISPLAY TABLE AND RESULTS
 $(document).ready(function() {   
   $('#invoices').DataTable( {
@@ -366,7 +359,8 @@ $(document).ready(function() {
 $(document).ready(function() {   
   $('#splitInvoices').DataTable( {
       retrieve: true, 
-      paging: false, 
+      paging: false,
+      responsive: true, 
       data: splitSet,
       columns: [
           { title: "Invoice" },
@@ -387,9 +381,11 @@ $(document).ready(function() {
 } );
 
   </script>
-  <table id="invoices" class="display" width="100%"></table>
-  <table id="pendInvoices" class="display" width="100%"></table>
-  <table id="splitInvoices" class="display" width="100%"></table>
+  <div class="container">
+  <table id="invoices" class="table table-striped table-bordered dt-responsive nowrap" width="100%"></table>
+  <table id="pendInvoices" class="table table-striped table-bordered dt-responsive nowrap" width="100%"></table>
+  <table id="splitInvoices" class="table table-striped table-bordered dt-responsive nowrap" width="100%"></table>
+  </div>
 </body>
 
 
