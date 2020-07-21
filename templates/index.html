@@ -7,81 +7,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/cosmo/bootstrap.min.css" integrity="sha384-9/chHLTCcBULgxOFoUyZXSgEF0uFXs+NrQqzcy/DXqcR+Sk8C1l4EgmUXAEzTb92" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
-  {% load static %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <!--{% load static %}
   {% load bootstrap_themes %}
   {% bootstrap_styles theme='cosmo' type='css' %}
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  {% bootstrap_script use_min=False %}
+  {% bootstrap_script use_min=False %}-->
   <title>ROA Payroll</title>
 
 
 </head>
-
 <body>
-
   <!-- Header -->
   <header>
-    <div class="row ">
-      <div class="col">
-        <!--<h1 class="display-4 text-white mt-5 mb-2">Business Name or Tagline</h1>
-        <p class="lead mb-5 text-white-50">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Non possimus ab labore provident mollitia. Id assumenda voluptate earum corporis facere quibusdam quisquam iste ipsa cumque unde nisi, totam quas ipsam.</p>-->
-        <!--<img src="{% static 'payroll/Rescue-One-Air-Header.png' %}" alt="ROA Header">-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarColor02">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'search' %}">Payroll</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Help</a>
+          </li>
+        </ul>
       </div>
-    </div>
-
+    </nav>
   </header>
   <!-- Page Content -->
   <div class="container">
-    <div class="row">
-      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-        <h2>ROA Payroll</h2>
-        <hr>
-        <p><b>Admin</b>: Will need Admin privileges to access. View all the data used for the site as well as access database information and manually manage employees, installation rates and more. </p>
-        <p><b>Payroll</b>: Generate commission report for technicians and helpers using a specific range of dates.</p>
-        <p><b>Help</b>: Need help? Check out this document.</p>
-      </div>
-      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-        <h2>Contact Us</h2>
-        <hr>
-        <address>
-          <strong>Kristin Bushong</strong>
-        </address>
-        <address>
-          <abbr title="Phone">Phone:</abbr>
-          (602) 882-3336
-          <br>
-          <abbr title="Email">Email:</abbr>
-          <a href="mailto:#">kristin@stellar.tech</a>
-        </address>
-      </div>
+    <div class="jumbotron">
+      <h1 class="display-3">Rescue One Air</h1>
+      <p class="lead">Payroll Commissions Report</p>
+      <hr class="my-4">
+      <p>Generate a commissions report for employees.</p>
+      <p class="lead">
+        <a class="btn btn-primary btn-lg" href="{% url 'search' %}" role="button">Go</a>
+      </p>
     </div>
   </div>
+  <br>
   <!--/container-->
-    <!--cards-->
-    <!-- insert links when ready 
-    <a href="#" class="card-link">Card link</a>
-    <a href="#" class="card-link">Another link</a>
-    -->
   <div class="container">
-    <div class="row">
+     <!--cards-->
+    <div class="row justify-content-center">
       <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
         <div class="card border-primary mb-3" style="max-width: 30rem;">
           <div class="card-header">Rescue One Air</div>
-          <div class="card-body">
+          <div class="card-body" style="margin:10px;">
             <h4 class="card-title">Admin Site</h4>
-            <p class="card-text">Backend database and logic for payroll site.</p>
-            <a href="{% url 'admin:index' %}" class="card-link">Card link</a>
+            <p class="card-text">Backend data and logic for payroll</p>
+            <a href="{% url 'admin:index' %}" class="btn btn-primary btn-sm" role="button" aria-pressed="true" style="border-radius: 7px;">Go</a>
           </div>
         </div>
       </div>
       <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
         <div class="card border-primary mb-3" style="max-width: 30rem;">
           <div class="card-header">Rescue One Air</div>
-          <div class="card-body">
+          <div class="card-body" style="margin:10px;">
             <h4 class="card-title">Payroll Site</h4>
-            <p class="card-text">Generate an employee payroll report.</p>
-            <a href="{% url 'search' %}" class="card-link">Card link</a>
+            <p class="card-text">Generate an employee payroll report</p>
+            <a href="{% url 'search' %}" class="btn btn-primary btn-sm" role="button" aria-pressed="true" style="border-radius: 7px;">Go</a>
           </div>
         </div>
       </div>
@@ -89,14 +85,37 @@
     </div>
     <!-- /.container -->
   </div>
-</body>
-
-
-  <!-- Footer -->
-  <footer class="py-5 bg-dark">
-    <div class="container">
-      <p class="m-0 text-center text-white">Copyright &copy; Rescue One Air 2020</p>
+  <br>
+  <br>
+  <div class="container">
+    <div class="row justify-content-center" style="max-width: max-content;">
+      <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+        <h2>More Information</h2>
+          <hr>
+          <p><b>Admin</b>: Will need Admin privileges to access. View and change the data used to generate commissions report. Able to access database information and manually manage employees, installation rates and more. </p>
+          <p><b>Payroll</b>: Generate commission report for technicians and helpers. Select a date range and an employee and the report will generate with normal, pending, and split commissions.</p>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <h2>Contact</h2>
+          <hr>
+          <address>
+            <strong>Kristin Bushong</strong>
+          </address>
+          <address>
+            <abbr title="Phone">Phone:</abbr>
+            (602) 882-3336
+            <br>
+            <abbr title="Email">Email:</abbr>
+            <a href="mailto:#">kristin@stellar.tech</a>
+          </address>
+      </div>
     </div>
-    <!-- /.container -->
-  </footer>
+  </div>
+  <br>
+  <br>
+</body>
+<!-- Footer -->
+<footer class="py-5 bg-dark">
+  <div class="container">
+    <p class="m-0 text-center text-white">Copyright &copy; Rescue One Air 2020</p>
 </html>

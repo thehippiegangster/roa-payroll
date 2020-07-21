@@ -13,38 +13,43 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import mimetypes
-import django_heroku
+#import django_heroku
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '#gxf6^78u7odf0qx@=wzrp^+9ovus-d&eziq06ativ4i45keb9'
+CSRF_COOKIE_SECURE = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['10.0.0.153', '127.0.0.1']
-
-
+ALLOWED_HOSTS = ['10.0.0.157', '127.0.0.1', 'localhost', '192.168.168.100']
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+SECURE_REFERRER_POLICY = 'same-origin'
 # Application definition
 
 INSTALLED_APPS = [
-    'payrollsite',
-    'import_export',
-    'liststyle',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
     'mathfilters',
+    'payrollsite',
+    'import_export',
+    'liststyle',
+    'bootstrap_themes',
 ]
 
 MIDDLEWARE = [
@@ -55,8 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
+    ]
 
 ROOT_URLCONF = 'payroll.urls'
 
@@ -76,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'payroll.wsgi.application'
+#WSGI_APPLICATION = 'payroll.wsgi.application'
 ASGI_APPLICATION = 'payroll.asgi.application'
 
 # Database
@@ -89,6 +93,7 @@ DATABASES = {
 	'PASSWORD': 'a1garage',
 	'HOST': '10.0.0.152',
 	'PORT': '3306',
+    	'CONN_MAX_AGE': 3600,
 	'OPTIONS': {
 	    'init_command': 'SET foreign_key_checks = 0;',
 	    },
@@ -127,14 +132,11 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
 #CSS
-mimetypes.add_type("text/css", ".css", True)
+if DEBUG:
+    import mimetypes
+    mimetypes.add_type("image/png", ".png", True)
+    mimetypes.add_type("text/css", ".css", True)
 
 # Configure Django App for Heroku.
-django_heroku.settings(locals())
+#django_heroku.settings(locals())
