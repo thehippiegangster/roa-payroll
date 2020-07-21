@@ -16,11 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from payrollsite import views
+from django.conf import settings
 from django.conf.urls.static import static
-from payroll import settings
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name='admin'),
     #path('payroll/', include('payrollsite.urls')),
     #webapp views
     path('', views.home, name='homepage'),
@@ -30,4 +31,4 @@ urlpatterns = [
     path('<int:pk>/', views.SearchUpdateView.as_view(), name='emp_change'),
     path('ajax/load_employees/', views.load_employees, name='load_employees'),
     path('results/', views.ResultsView.as_view(), name='results'),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

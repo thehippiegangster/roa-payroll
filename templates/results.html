@@ -11,6 +11,30 @@
     }
   </style>
 </head>
+<header>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarColor02">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'homepage' %}">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'search' %}">Payroll</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#">Help</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
 <body>
   <script type="text/javascript">
     var object_list = ["{{object_list}}"];
@@ -24,7 +48,6 @@
     var dataSet =[];
     var splitSet = [];
     var pendSet = [];
-    var notes = [];
 
     var pendingStatus = null;
     var percFee = 0.0;
@@ -52,6 +75,7 @@
 
 //loop through employee invoices and get values 
     {% for inv in object_list %}
+      var notes = "";
       //get invoice variables from main queryset
       object_list[i] = {};
       object_list[i]['invoice'] = "{{inv}}";
@@ -103,11 +127,11 @@
       //send data to table row
       if(isValid == true){
         if(isSplit === true) {
-          splitSet.push([invoice, customer, pendingStatus, invAmt.toFixed(2), collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+          splitSet.push([invoice, customer, pendingStatus, invAmt.toFixed(2), collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, notes]);
         } else if(pendingStatus != null) {
-          pendSet.push([invoice, customer, pendingStatus, invAmt.toFixed(2), collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+          pendSet.push([invoice, customer, pendingStatus, invAmt.toFixed(2), collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, notes]);
         } else if(isSplit != true) {
-          dataSet.push([invoice, customer, pendingStatus, invAmt.toFixed(2), collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, "notes"]);
+          dataSet.push([invoice, customer, pendingStatus, invAmt.toFixed(2), collected, parts, profit.toFixed(2), earnings.toFixed(2), pma, notes]);
         }
       }
       
@@ -128,8 +152,6 @@ function checkSplits(invoice){
     
     if(sinvoice == invoice) {
       split = true;
-      notes.push(desc);
-      //console.log(notes);
       return split;
     }
     i++;
@@ -185,13 +207,13 @@ function getPMABonus(invoice){
     if(pminv == invoice){
       if(j==0){
         bonus = 10;
+        notes = pmdesc;
       } else if(j > 0) {
         bonus = 5;
+        notes = pmdesc;
       }
       j = ++j;
       pmbonus = bonus;
-      notes.push(pmdesc);
-      //console.log(notes);
     } 
     i++;
   {% endfor %}
@@ -231,12 +253,10 @@ function getSplitEarnings(invoice, employee){
       desc = "{{s.desc}}";
       if("{{s.invoice}}" == invoice && desc.includes("SPLIT SYSTEM")){
         splitEarnings = rate * splitSystem;
-        notes.push(desc);
-        //console.log(notes);
+        notes = desc;
       } else if ("{{s.invoice}}" == invoice && desc.includes("PACKAGE UNIT")){
         splitEarnings = rate * packageUnit;
-        notes.push(desc);
-        //console.log(notes);
+        notes = desc;
       }
     {% endfor %}
   
