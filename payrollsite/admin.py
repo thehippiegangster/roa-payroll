@@ -1,7 +1,6 @@
 from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
-#from liststyle import ListStyleAdminMixin
 
 from payrollsite.models import Customer
 from payrollsite.models import Extra

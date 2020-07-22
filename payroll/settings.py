@@ -48,8 +48,6 @@ INSTALLED_APPS = [
     'mathfilters',
     'payrollsite',
     'import_export',
-    'liststyle',
-    'bootstrap_themes',
 ]
 
 MIDDLEWARE = [
