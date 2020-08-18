@@ -7,6 +7,8 @@ from django.template import RequestContext
 from django.urls import reverse_lazy
 from django.db.models import FloatField
 from django.db.models.functions import Cast
+from datetime import datetime
+import datefinder
 
 from .models import InvoiceSale, Salesled, Technician, Helper, Recled, Financing, Extra, InstallationRate, Employee
 
@@ -18,12 +20,6 @@ def home(request):
 
 def getInvoices(request):
 	return TemplateResponse(request, 'GetInvoices.html')
-
-'''def SearchView(request):
-	return TemplateResponse(request, 'search.html', {'invoices': InvoiceSale.objects.all(), 'employees': Technician.objects.all()})'''
-
-'''def ResultsView(request):
-	return TemplateResponse(request, 'results.html', context=InvoiceSale)'''
 
 class SearchView(TemplateView):
 	template_name = 'search.html'
@@ -40,7 +36,7 @@ class SearchCreateView(CreateView):
 	success_url = reverse_lazy('search')
 
 	def get_context_data(self, **kwargs):
-		context = super(SearchView, self).get_context_data(**kwargs)
+		context = super(SearchCreateView, self).get_context_data(**kwargs)
 		context['invoices'] = InvoiceSale.objects.all()
 		context['employees'] = Employee.objects.all()
 		
@@ -51,38 +47,34 @@ class SearchUpdateView(UpdateView):
 	template_name = 'search.html'
 	success_url = reverse_lazy('search')
 
-	def get_context_data(self, **kwargs):
-		context = super(SearchView, self).get_context_data(**kwargs)
+	'''def get_context_data(self, **kwargs):
+		context = super(SearchUpdateView, self).get_context_data(**kwargs)
 		context['invoices'] = InvoiceSale.objects.all()
 		context['employees'] = Employee.objects.all()
 		
-		return context
+		return context'''
 
-def load_employees(request):
-
-	def get_context_data(self, **kwargs):
-		context = super(SearchView, self).get_context_data(**kwargs)
-		context['invoices'] = InvoiceSale.objects.all()
-		context['employees'] = Employee.objects.all()
+	def load_employees(request):
+		#context = super(SearchUpdateView, self).get_context_data(self,**kwargs)
+		#context['invoices'] = InvoiceSale.objects.all()
+		#context['employees'] = Employee.objects.all()
 		
-		return context
+		startDate = request.GET.get('startDate')
+		endDate = request.GET.get('endDate')
+		tech_inv = InvoiceSale.objects.filter(
+			Q(invdate__gt=startDate) & 
+			Q(invdate__lt=endDate)
+			).values('salesman').distinct()
+		clerk_inv = InvoiceSale.objects.filter(
+			Q(invdate__gt=startDate) & 
+			Q(invdate__lt=endDate)
+			).values('clerk').distinct()
 
-	startDate = request.GET.get('startDate')
-	endDate = request.GET.get('endDate')
-	tech_inv = InvoiceSale.objects.filter(
-		Q(invdate__gt=startDate) & 
-		Q(invdate__lt=endDate)
-		).values('salesman').distinct()
-	tech_inv = InvoiceSale.objects.filter(
-		Q(invdate__gt=startDate) & 
-		Q(invdate__lt=endDate)
-		).values('clerk').distinct()
+		
+		employees = Employee.objects.filter(Q(employee_id__in=tech_inv) | Q(employee_id__in=clerk_inv)).order_by('name')
+		
 
-	
-	employees = Employee.objects.filter(Q(employee_id__in=tech_inv) | Q(employee_id__in=clerk_inv))
-	
-
-	return render(request, 'emp_dropdown_list_options.html', {'employees': employees})
+		return render(request, 'emp_dropdown_list_options.html', {'employees': employees})
 
 class ResultsView(ListView):
 	
@@ -96,7 +88,8 @@ class ResultsView(ListView):
 		context['helper'] = Helper.objects.all()
 		context['employees'] = Employee.objects.all()
 		context['financing'] = Financing.objects.all()
-		context['pending'] = self.get_pending_invoices
+		context['currentpending'] = self.get_current_pending
+		context['allpending'] = self.get_all_pending
 		context['payments'] = self.get_payments
 		context['pmas'] = self.get_pma_invoices
 		context['extras'] = self.get_extras
@@ -104,6 +97,9 @@ class ResultsView(ListView):
 		context['paymentfees'] = self.get_pmt_fee
 		context['splits'] = self.get_splits
 		context['rate'] = self.get_rate
+		context['emp'] = self.get_employee_name
+		context['start'] = self.request.GET.get('start')
+		context['end'] = self.request.GET.get('end')
 		'''context.update({
 			'pending': self.get_pending_invoices
 			})'''
@@ -114,7 +110,6 @@ class ResultsView(ListView):
 		startDate = self.request.GET.get('start')
 		endDate = self.request.GET.get('end')
 		employee = self.request.GET.get('employee')
-		invoices = []
 
 		emp_invoices = InvoiceSale.objects.filter(
 			Q(invdate__gt=startDate) & 
@@ -125,14 +120,54 @@ class ResultsView(ListView):
 
 		return emp_invoices
 
-	def get_pending_invoices(self):
-		emp_invoices = self.get_queryset()
+	def get_employee_name(self):
+		inc_emp = self.request.GET.get('employee')
+		emp = Employee.objects.get(employee_id=inc_emp) 
+		return emp.name
 
-		pendList = Salesled.objects.filter(
-			Q(invoice__in=emp_invoices) &
+	def get_all_pending(self):
+		incoming_start = self.request.GET.get('start')
+		incoming_end = self.request.GET.get('end')
+		employee = self.request.GET.get('employee')
+		startDate = datetime.strptime(incoming_start, '%Y-%m-%d')
+		endDate = datetime.strptime(incoming_end,'%Y-%m-%d')
+		pendList = []
+		
+		all_invoices = InvoiceSale.objects.filter(
+			(Q(salesman__employee_id=employee) | 
+			Q(clerk__employee_id=employee))
+		)
+		all_pending = Salesled.objects.filter(
+			Q(invoice__in=all_invoices) &
 			Q(desc__icontains='PENDING')
 		)
 
+		for p in all_pending:
+			matches = datefinder.find_dates(p.desc)
+			for m in matches:
+				if(m > startDate and m < endDate):
+					pendList.append(p)
+			
+		return pendList
+	
+	def get_current_pending(self):
+		startDate = self.request.GET.get('start')
+		endDate = self.request.GET.get('end')
+		employee = self.request.GET.get('employee')
+		
+		emp_invoices = InvoiceSale.objects.filter(
+			Q(invdate__gt=startDate) & 
+			Q(invdate__lt=endDate) &
+			(Q(salesman__employee_id=employee) | 
+			Q(clerk__employee_id=employee))
+		)
+
+		currentPending = Salesled.objects.filter(
+			Q(invoice__in=emp_invoices) &
+			Q(desc__icontains='PENDING')
+		)
+		pendList = [pen for pen in currentPending]
+			
 		return pendList
 
 	def get_pma_invoices(self):
@@ -146,15 +181,12 @@ class ResultsView(ListView):
 		return pmaList
 
 	def get_pmt_fee(self):
-		financefees = []
 		costs = Recled.objects.annotate(
 			cost_as_float=Cast(
 				'paymethod__cost', output_field=FloatField())
 			)
 
-		'''for c in costs:
-			financefee = c.cost_as_float/100
-			financefees.append(financefee)'''
+
 
 		return costs
 

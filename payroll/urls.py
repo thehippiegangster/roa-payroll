@@ -29,6 +29,6 @@ urlpatterns = [
     path('search/', views.SearchView.as_view(), name='search'),
     path('add/', views.SearchCreateView.as_view(), name='emp_add'),
     path('<int:pk>/', views.SearchUpdateView.as_view(), name='emp_change'),
-    path('ajax/load_employees/', views.load_employees, name='load_employees'),
+    path('ajax/load_employees/', views.SearchUpdateView.load_employees, name='load_employees'),
     path('results/', views.ResultsView.as_view(), name='results'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

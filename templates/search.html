@@ -20,7 +20,7 @@ $( document ).ready(function() {
     });
     $("#datepicker").on("change", function () {
         var startdate = $(this).val();
-        alert(startdate);
+        //alert(startdate);
     });
 }); 
 $( document ).ready(function() {
@@ -29,7 +29,7 @@ $( document ).ready(function() {
     });
     $("#datepicker1").on("change", function () {
         var enddate = $(this).val();
-        alert(enddate);
+        //alert(enddate);
     });
 }); 
 </script>
@@ -62,12 +62,12 @@ $( document ).ready(function() {
   <div style="margin: 15px;">
     <row>
     </row>
- <h3>Please select two Sundays for Start Date and End Date:</h3>
+ <h3>Please select two days for Start Date and End Date:</h3>
  <br>
   <form method="get" id="searchForm" data-emp-url="{% url 'load_employees' %}" novalidate>
   <input type="hidden" id="csrf_token" value='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
-  <p style="font-size: large;">Date Start: <input type="date" id="datepicker" name="start" placeholder="Start Date"></p>
-  <p style="font-size: large;">Date End: <input type="date" id="datepicker1" name="end" placeholder="End Date"></p>
+  <p style="font-size: large;">Date Start: <input type="date" id="datepicker" name="start" placeholder="yyyy-mm-dd"></p>
+  <p style="font-size: large;">Date End: <input type="date" id="datepicker1" name="end" placeholder="yyyy-mm-dd"></p>
   <br>
   <h3>Please select an employee:</h3>
   <label class="mdb-main-label" style="font-size: large;">Employee</label>
@@ -82,13 +82,14 @@ $( document ).ready(function() {
       var startdate = $('#datepicker').val();  // get the selected dates from the HTML input
       var enddate = $('#datepicker1').val();
 
-      $.ajax({                       // initialize an AJAX request
-        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+      $.ajax({    
+        type: 'GET',                   // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load_employees/)
         data: {
           'startDate': startdate,
           'endDate': enddate,      // add the start and end date to the GET parameters
         },
-        success: function (data) {   // `data` is the return of the `load_cities` view function
+        success: function (data) {   // `data` is the return of the `load_employees` view function
           $("#employees").html(data);  // replace the contents of the employee input with the data that came from the server
         }
       });

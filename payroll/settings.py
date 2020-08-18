@@ -1,4 +1,3 @@
-
 """
 Django settings for payroll project.
 
@@ -32,8 +31,8 @@ CSRF_COOKIE_SECURE = True
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['10.0.0.157', '127.0.0.1', 'localhost', '192.168.168.100']
-SECURE_SSL_REDIRECT = True
+ALLOWED_HOSTS = ['0.0.0.0','10.0.0.157', '127.0.0.1', 'localhost', '192.168.168.100', 'payroll']
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
 SECURE_REFERRER_POLICY = 'same-origin'
 # Application definition
@@ -48,6 +47,7 @@ INSTALLED_APPS = [
     'mathfilters',
     'payrollsite',
     'import_export',
+    'bootstrap_themes',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    ]
+]
 
 ROOT_URLCONF = 'payroll.urls'
 
